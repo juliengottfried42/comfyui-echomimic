@@ -58,4 +58,32 @@ if [ ! -f /comfyui/models/facerestore_models/GFPGANv1.4.pth ]; then
         "https://huggingface.co/datasets/Gourieff/ReActor/resolve/main/models/facerestore_models/GFPGANv1.4.pth"
 fi
 
+# ============================================================
+# CHROMA — Unzensiertes Flux-basiertes Bildmodell (8.9B, ~9 GB)
+# ============================================================
+
+# CHROMA Checkpoint (fp8, 9.08 GB)
+if [ ! -f /comfyui/models/checkpoints/chroma-unlocked-v35-fp8.safetensors ]; then
+    echo "Lade CHROMA Checkpoint (9 GB)..."
+    mkdir -p /comfyui/models/checkpoints
+    wget -q --show-progress -O /comfyui/models/checkpoints/chroma-unlocked-v35-fp8.safetensors \
+        "https://huggingface.co/lodestones/Chroma/resolve/main/chroma-unlocked-v35-fp8.safetensors"
+fi
+
+# CLIP Text Encoder t5xxl_fp8 (fuer CHROMA/Flux, 4.89 GB) — evtl. schon da als umt5_xxl
+if [ ! -f /comfyui/models/clip/t5xxl_fp8_e4m3fn.safetensors ]; then
+    echo "Lade T5-XXL Text Encoder fuer CHROMA (4.9 GB)..."
+    mkdir -p /comfyui/models/clip
+    wget -q --show-progress -O /comfyui/models/clip/t5xxl_fp8_e4m3fn.safetensors \
+        "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors"
+fi
+
+# Flux VAE (fuer CHROMA, 335 MB)
+if [ ! -f /comfyui/models/vae/ae.safetensors ]; then
+    echo "Lade Flux VAE fuer CHROMA..."
+    mkdir -p /comfyui/models/vae
+    wget -q --show-progress -O /comfyui/models/vae/ae.safetensors \
+        "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors"
+fi
+
 echo "=== Alle Models bereit ==="
