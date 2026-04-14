@@ -55,11 +55,11 @@
     "class_type": "Echo_Sampler",
     "inputs": {
       "predata": ["6", 0],
-      "cfg": 2.5,
-      "steps": 10,
+      "cfg": 3.5,
+      "steps": 15,
       "seed": -1,
       "sample_rate": 16000,
-      "context_frames": 12,
+      "context_frames": 16,
       "context_overlap": 3
     }
   },
