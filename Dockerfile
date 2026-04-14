@@ -60,6 +60,7 @@ RUN cd /comfyui/custom_nodes && \
     git clone https://github.com/Gourieff/ComfyUI-ReActor.git && \
     cd ComfyUI-ReActor && \
     pip install --no-cache-dir -c /tmp/torch-constraint.txt -r requirements.txt && \
+    apt-get update && apt-get install -y --no-install-recommends build-essential g++ && rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir cython numpy && \
     pip install --no-cache-dir -c /tmp/torch-constraint.txt onnxruntime-gpu insightface
 
