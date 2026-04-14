@@ -111,6 +111,21 @@ RUN chmod +x /comfyui/download_models.sh
 COPY workflows/ /comfyui/user/default/workflows/
 
 # ============================================================
-# 5. Verify PyTorch CUDA is still intact
+# 5. Verify PyTorch CUDA + EchoMimic imports
 # ============================================================
-RUN python3 -c "import torch; assert torch.cuda.is_available() or True, 'CUDA check skipped in build'; print(f'PyTorch {torch.__version__} OK')"
+RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} OK')" && \
+    python3 -c "\
+import sys; sys.path.insert(0, '/comfyui'); sys.path.insert(0, '/comfyui/custom_nodes/ComfyUI_EchoMimic'); \
+print('Testing EchoMimic imports...'); \
+import mediapipe; print('  mediapipe OK'); \
+import librosa; print('  librosa OK'); \
+import decord; print('  decord OK'); \
+import pyloudnorm; print('  pyloudnorm OK'); \
+import diffusers; print('  diffusers OK'); \
+import transformers; print('  transformers OK'); \
+import omegaconf; print('  omegaconf OK'); \
+import einops; print('  einops OK'); \
+import torchaudio; print('  torchaudio OK'); \
+import huggingface_hub; print('  huggingface_hub OK'); \
+print('All EchoMimic deps OK') \
+"
