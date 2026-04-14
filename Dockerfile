@@ -56,13 +56,13 @@ RUN cd /comfyui/custom_nodes && \
     pip install --no-cache-dir --no-deps retina-face==0.0.17
 
 # ReActor — Face-Swap (Avatar-Gesicht auf echte Videos)
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential g++ && rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir cython numpy
 RUN cd /comfyui/custom_nodes && \
     git clone https://github.com/Gourieff/ComfyUI-ReActor.git && \
     cd ComfyUI-ReActor && \
     pip install --no-cache-dir -c /tmp/torch-constraint.txt -r requirements.txt && \
-    apt-get update && apt-get install -y --no-install-recommends build-essential g++ && rm -rf /var/lib/apt/lists/* && \
-    pip install --no-cache-dir cython numpy && \
-    pip install --no-cache-dir -c /tmp/torch-constraint.txt onnxruntime-gpu insightface
+    pip install --no-cache-dir -c /tmp/torch-constraint.txt onnxruntime-gpu
 
 # VideoHelperSuite — Video-Output (VHS_VideoCombine)
 RUN comfy-node-install comfyui-videohelpersuite
