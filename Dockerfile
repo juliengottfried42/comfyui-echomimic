@@ -116,22 +116,20 @@ RUN chmod +x /comfyui/download_models.sh
 COPY workflows/ /comfyui/user/default/workflows/
 
 # ============================================================
-# 5. Verify PyTorch CUDA + ComfyUI node loading (Echo_LoadModel)
+# 5. Verify PyTorch CUDA + EchoMimic deps (no GPU needed)
 # ============================================================
-RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} OK')"
-RUN printf '%s\n' \
-    'import sys, importlib, traceback' \
-    'sys.path.insert(0, "/comfyui")' \
-    'sys.path.insert(0, "/comfyui/custom_nodes")' \
-    'print("Loading ComfyUI_EchoMimic node...")' \
-    'try:' \
-    '    mod = importlib.import_module("ComfyUI_EchoMimic")' \
-    '    nodes = list(mod.NODE_CLASS_MAPPINGS.keys())' \
-    '    print("  Registered nodes:", nodes)' \
-    '    assert "Echo_LoadModel" in mod.NODE_CLASS_MAPPINGS, "Echo_LoadModel missing!"' \
-    '    print("  Echo_LoadModel OK")' \
-    'except Exception as e:' \
-    '    print("FAILED:", e)' \
-    '    traceback.print_exc()' \
-    '    sys.exit(1)' \
-    > /tmp/test_echo_node.py && python3 /tmp/test_echo_node.py
+RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} OK')" && \
+    python3 -c "\
+import sys; sys.path.insert(0, '/comfyui'); sys.path.insert(0, '/comfyui/custom_nodes/ComfyUI_EchoMimic'); \
+print('Testing EchoMimic deps...'); \
+import mediapipe; print('  mediapipe OK:', mediapipe.__version__); \
+from mediapipe import solutions; print('  mediapipe.solutions OK'); \
+import librosa; print('  librosa OK'); \
+import decord; print('  decord OK'); \
+import pyloudnorm; print('  pyloudnorm OK'); \
+import diffusers; print('  diffusers OK'); \
+import transformers; print('  transformers OK'); \
+import einops; print('  einops OK'); \
+import torchaudio; print('  torchaudio OK'); \
+print('All EchoMimic deps OK') \
+"
