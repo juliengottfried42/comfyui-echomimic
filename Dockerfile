@@ -52,6 +52,7 @@ RUN cd /comfyui/custom_nodes && \
     pip install --no-cache-dir --no-deps facenet-pytorch && \
     pip install --no-cache-dir tensorflow-cpu tf-keras && \
     pip install --no-cache-dir gdown fire mtcnn Pillow flask flask_cors gunicorn && \
+    pip install --no-cache-dir librosa decord pyloudnorm && \
     pip install --no-cache-dir --no-deps deepface && \
     pip install --no-cache-dir --no-deps retina-face==0.0.17
 
