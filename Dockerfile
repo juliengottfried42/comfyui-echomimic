@@ -10,6 +10,12 @@
 FROM runpod/worker-comfyui:5.8.5-base
 
 # ============================================================
+# 0a. Activate venv — base image runs ComfyUI in /opt/venv
+# ============================================================
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# ============================================================
 # 0. Freeze PyTorch — prevent any dependency from replacing
 #    the CUDA-enabled torch shipped with the base image.
 # ============================================================
