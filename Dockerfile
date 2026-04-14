@@ -57,7 +57,7 @@ RUN cd /comfyui/custom_nodes && \
 
 # ReActor — Face-Swap (Avatar-Gesicht auf echte Videos)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential g++ python3-dev libgl1-mesa-glx libglib2.0-0 && \
+    build-essential g++ python3-dev libgl1 libglib2.0-0 && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir cython numpy
 RUN cd /comfyui/custom_nodes && \
