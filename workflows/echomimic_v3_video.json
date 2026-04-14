@@ -1,5 +1,5 @@
 {
-  "_comment": "KI Avatar Studio — EchoMimic V3 Video Workflow. Input: Bild + Audio → Video mit Lip-Sync + Gestik. Aufruf via RunPod API.",
+  "_comment": "KI Avatar Studio — EchoMimic V3 HD Video Workflow. Input: Bild + Audio → 576x1024 → Real-ESRGAN x2 → GFPGAN Face Restore → 1080x1920 Output.",
   "1": {
     "class_type": "LoadImage",
     "inputs": {
@@ -43,7 +43,7 @@
       "audio": ["2", 0],
       "clip": ["3", 0],
       "clip_vision": ["4", 0],
-      "resolution": "384x576",
+      "resolution": "576x1024",
       "steps": 25,
       "cfg_start": 0.1,
       "cfg_end": 0.8,
@@ -63,10 +63,48 @@
       "context_overlap": 3
     }
   },
+  "9": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "RealESRGAN_x2plus.pth"
+    }
+  },
+  "10": {
+    "class_type": "ImageUpscaleWithModel",
+    "inputs": {
+      "upscale_model": ["9", 0],
+      "image": ["7", 0]
+    }
+  },
+  "11": {
+    "class_type": "FaceRestoreModelLoader",
+    "inputs": {
+      "model_name": "GFPGANv1.4.pth"
+    }
+  },
+  "12": {
+    "class_type": "FaceRestoreCFWithModel",
+    "inputs": {
+      "facerestore_model": ["11", 0],
+      "image": ["10", 0],
+      "facedetection": "retinaface_resnet50",
+      "codeformer_fidelity": 0.5
+    }
+  },
+  "13": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": ["12", 0],
+      "width": 1080,
+      "height": 1920,
+      "upscale_method": "lanczos",
+      "crop": "disabled"
+    }
+  },
   "8": {
     "class_type": "VHS_VideoCombine",
     "inputs": {
-      "images": ["7", 0],
+      "images": ["13", 0],
       "audio": ["2", 0],
       "frame_rate": 24,
       "format": "video/h264-mp4",

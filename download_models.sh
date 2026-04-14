@@ -50,6 +50,14 @@ if [ ! -f /comfyui/models/clip_vision/clip_vision_h.safetensors ]; then
         "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors"
 fi
 
+# Real-ESRGAN x2plus Upscaler (67 MB)
+if [ ! -f /comfyui/models/upscale_models/RealESRGAN_x2plus.pth ]; then
+    echo "Lade Real-ESRGAN x2plus Upscaler..."
+    mkdir -p /comfyui/models/upscale_models
+    wget -q -O /comfyui/models/upscale_models/RealESRGAN_x2plus.pth \
+        "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth"
+fi
+
 # GFPGANv1.4 Face Restore (350 MB)
 if [ ! -f /comfyui/models/facerestore_models/GFPGANv1.4.pth ]; then
     echo "Lade GFPGAN Face Restore..."

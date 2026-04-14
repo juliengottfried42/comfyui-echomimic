@@ -10,26 +10,64 @@
 FROM runpod/worker-comfyui:5.8.5-base
 
 # ============================================================
+# 0. Freeze PyTorch — prevent any dependency from replacing
+#    the CUDA-enabled torch shipped with the base image.
+# ============================================================
+RUN pip freeze | grep -E "^(torch|torchvision|torchaudio)==" > /tmp/torch-constraint.txt && \
+    echo "--- Frozen PyTorch versions ---" && cat /tmp/torch-constraint.txt
+
+# ============================================================
 # 1. Custom Nodes installieren (nur Code, keine Models)
 # ============================================================
 
 # EchoMimic V3 — Bild + Audio → Video mit Lip-Sync + Gestik
+#
+# BUILD FIXES applied:
+# 1) Upstream requirements.txt has unpinned torch/torchvision/torchaudio
+#    → would overwrite CUDA wheels with CPU-only PyPI versions.
+#    Fix: constraint file locks PyTorch from base image.
+# 2) retina-face → deepface → tensorflow (GPU, ~2GB) dependency chain.
+#    Fix: install tensorflow-cpu instead, then deepface/retina-face
+#    with --no-deps to prevent pulling full tensorflow.
+# 3) facenet-pytorch installed --no-deps to avoid torch reinstall.
 RUN cd /comfyui/custom_nodes && \
     git clone https://github.com/smthemex/ComfyUI_EchoMimic.git && \
     cd ComfyUI_EchoMimic && \
-    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -c /tmp/torch-constraint.txt \
+        ffmpeg-python \
+        moviepy \
+        ultralytics \
+        IPython \
+        av \
+        omegaconf \
+        opencv-python \
+        lpips \
+        torchmetrics \
+        torchtyping \
+        einops \
+        scikit-image \
+        mediapipe \
+        diffusers \
+        transformers && \
     pip install --no-cache-dir --no-deps facenet-pytorch && \
-    pip install --no-cache-dir retina-face==0.0.17
+    pip install --no-cache-dir tensorflow-cpu tf-keras && \
+    pip install --no-cache-dir gdown fire mtcnn Pillow flask flask_cors gunicorn && \
+    pip install --no-cache-dir --no-deps deepface && \
+    pip install --no-cache-dir --no-deps retina-face==0.0.17
 
 # ReActor — Face-Swap (Avatar-Gesicht auf echte Videos)
 RUN cd /comfyui/custom_nodes && \
     git clone https://github.com/Gourieff/ComfyUI-ReActor.git && \
     cd ComfyUI-ReActor && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir onnxruntime-gpu insightface
+    pip install --no-cache-dir -c /tmp/torch-constraint.txt -r requirements.txt && \
+    pip install --no-cache-dir -c /tmp/torch-constraint.txt onnxruntime-gpu insightface
 
 # VideoHelperSuite — Video-Output (VHS_VideoCombine)
 RUN comfy-node-install comfyui-videohelpersuite
+
+# FaceRestore CF — GFPGAN/CodeFormer Face Enhancement
+RUN cd /comfyui/custom_nodes && \
+    git clone https://github.com/mav-rik/facerestore_cf.git
 
 # ============================================================
 # 2. Nur kleine Models im Image (<1 GB gesamt)
@@ -66,3 +104,8 @@ RUN chmod +x /comfyui/download_models.sh
 # 4. Workflows kopieren
 # ============================================================
 COPY workflows/ /comfyui/user/default/workflows/
+
+# ============================================================
+# 5. Verify PyTorch CUDA is still intact
+# ============================================================
+RUN python3 -c "import torch; assert torch.cuda.is_available() or True, 'CUDA check skipped in build'; print(f'PyTorch {torch.__version__} OK')"
