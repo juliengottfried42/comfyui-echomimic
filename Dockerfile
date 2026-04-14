@@ -52,7 +52,7 @@ RUN cd /comfyui/custom_nodes && \
         torchtyping \
         einops \
         scikit-image \
-        mediapipe \
+        "mediapipe==0.10.14" \
         diffusers \
         transformers && \
     pip install --no-cache-dir --no-deps facenet-pytorch && \
