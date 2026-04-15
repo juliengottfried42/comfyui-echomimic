@@ -144,7 +144,7 @@ import diffusers; print('  diffusers OK'); \
 import transformers; print('  transformers OK'); \
 import einops; print('  einops OK'); \
 import torchaudio; print('  torchaudio OK'); \
-import keras; print('  keras OK:', keras.__version__); \
+import keras; print('  keras OK'); \
 from keras.models import load_model; print('  keras.models.load_model OK'); \
 import retina_face; print('  retina_face OK'); \
 import deepface; print('  deepface OK'); \
