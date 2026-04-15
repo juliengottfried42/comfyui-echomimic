@@ -14,6 +14,7 @@ FROM runpod/worker-comfyui:5.8.5-base
 # ============================================================
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+ENV KERAS_BACKEND=torch
 
 # ============================================================
 # 0. Freeze PyTorch — prevent any dependency from replacing
