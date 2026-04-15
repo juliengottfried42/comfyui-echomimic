@@ -60,9 +60,17 @@ RUN cd /comfyui/custom_nodes && \
     pip install --no-cache-dir gdown fire mtcnn Pillow flask flask_cors gunicorn && \
     pip install --no-cache-dir librosa decord pyloudnorm && \
     pip install --no-cache-dir --no-deps deepface && \
-    pip install --no-cache-dir --no-deps retina-face==0.0.17 && \
-    pip install --no-cache-dir keras && \
-    python3 -c "import os,site; [open(p,'w').write(open(p).read().replace('from keras import _tf_keras as _tf_keras\n','')) or print('Patched keras/__init__.py') for p in [os.path.join(sp,'keras','__init__.py') for sp in site.getsitepackages()] if os.path.exists(p)]"
+    pip install --no-cache-dir --no-deps retina-face==0.0.17
+
+# keras stub — retina-face needs 'from keras.models import load_model' at import
+# time. keras 3 requires tensorflow (conflicts with numpy 2.x). EchoMimic V3
+# never actually calls retina-face at runtime, so a stub is sufficient.
+RUN SP=$(python3 -c "import site; print(site.getsitepackages()[0])") && \
+    mkdir -p "$SP/keras/models" && \
+    touch "$SP/keras/__init__.py" && \
+    printf 'def load_model(*args, **kwargs):\n    raise RuntimeError("keras stub")\n' \
+        > "$SP/keras/models/__init__.py" && \
+    python3 -c "from keras.models import load_model; print('keras stub OK')"
 
 # ReActor — Face-Swap (Avatar-Gesicht auf echte Videos)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -144,8 +152,7 @@ import diffusers; print('  diffusers OK'); \
 import transformers; print('  transformers OK'); \
 import einops; print('  einops OK'); \
 import torchaudio; print('  torchaudio OK'); \
-import keras; print('  keras OK'); \
-from keras.models import load_model; print('  keras.models.load_model OK'); \
+from keras.models import load_model; print('  keras stub OK'); \
 import retina_face; print('  retina_face OK'); \
 import deepface; print('  deepface OK'); \
 print('All EchoMimic deps OK') \
