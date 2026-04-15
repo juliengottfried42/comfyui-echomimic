@@ -61,7 +61,18 @@ RUN cd /comfyui/custom_nodes && \
     pip install --no-cache-dir librosa decord pyloudnorm && \
     pip install --no-cache-dir --no-deps deepface && \
     pip install --no-cache-dir --no-deps retina-face==0.0.17 && \
-    pip install --no-cache-dir keras
+    pip install --no-cache-dir keras && \
+    python3 -c "
+import os, site
+for sp in site.getsitepackages():
+    p = os.path.join(sp, 'keras', '__init__.py')
+    if os.path.exists(p):
+        content = open(p).read()
+        patched = content.replace('from keras import _tf_keras as _tf_keras\n', '')
+        open(p, 'w').write(patched)
+        print('Patched keras/__init__.py: removed _tf_keras shim')
+        break
+"
 
 # ReActor — Face-Swap (Avatar-Gesicht auf echte Videos)
 RUN apt-get update && apt-get install -y --no-install-recommends \
