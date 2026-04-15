@@ -133,7 +133,7 @@ COPY workflows/ /comfyui/user/default/workflows/
 # 6. Startup Override — download_models.sh vor ComfyUI starten
 # ============================================================
 RUN cp /start.sh /start_orig.sh
-RUN printf '#!/bin/bash\n/comfyui/download_models.sh\nexec /start_orig.sh "$@"\n' > /start.sh && \
+RUN printf '#!/bin/bash\n/comfyui/download_models.sh &\nexec /start_orig.sh "$@"\n' > /start.sh && \
     chmod +x /start.sh
 
 # ============================================================
