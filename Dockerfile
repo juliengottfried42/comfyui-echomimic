@@ -153,7 +153,7 @@ import transformers; print('  transformers OK'); \
 import einops; print('  einops OK'); \
 import torchaudio; print('  torchaudio OK'); \
 from keras.models import load_model; print('  keras stub OK'); \
-import retina_face; print('  retina_face OK'); \
+import retinaface; print('  retinaface OK'); \
 import deepface; print('  deepface OK'); \
 print('All EchoMimic deps OK') \
 "
