@@ -59,7 +59,8 @@ RUN cd /comfyui/custom_nodes && \
     pip install --no-cache-dir gdown fire mtcnn Pillow flask flask_cors gunicorn && \
     pip install --no-cache-dir librosa decord pyloudnorm && \
     pip install --no-cache-dir --no-deps deepface && \
-    pip install --no-cache-dir --no-deps retina-face==0.0.17
+    pip install --no-cache-dir --no-deps retina-face==0.0.17 && \
+    pip install --no-cache-dir keras
 
 # ReActor — Face-Swap (Avatar-Gesicht auf echte Videos)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -118,6 +119,16 @@ COPY workflows/ /comfyui/user/default/workflows/
 # ============================================================
 # 5. Verify PyTorch CUDA + EchoMimic deps (no GPU needed)
 # ============================================================
+# ============================================================
+# 6. Startup Override — download_models.sh vor ComfyUI starten
+# ============================================================
+RUN cp /start.sh /start_orig.sh
+RUN printf '#!/bin/bash\n/comfyui/download_models.sh\nexec /start_orig.sh "$@"\n' > /start.sh && \
+    chmod +x /start.sh
+
+# ============================================================
+# 7. Verify PyTorch CUDA + EchoMimic deps (no GPU needed)
+# ============================================================
 RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} OK')" && \
     python3 -c "\
 import sys; sys.path.insert(0, '/comfyui'); sys.path.insert(0, '/comfyui/custom_nodes/ComfyUI_EchoMimic'); \
@@ -131,5 +142,9 @@ import diffusers; print('  diffusers OK'); \
 import transformers; print('  transformers OK'); \
 import einops; print('  einops OK'); \
 import torchaudio; print('  torchaudio OK'); \
+import keras; print('  keras OK:', keras.__version__); \
+from keras.models import load_model; print('  keras.models.load_model OK'); \
+import retina_face; print('  retina_face OK'); \
+import deepface; print('  deepface OK'); \
 print('All EchoMimic deps OK') \
 "

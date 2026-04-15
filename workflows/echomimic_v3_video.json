@@ -109,7 +109,9 @@
       "frame_rate": 24,
       "format": "video/h264-mp4",
       "filename_prefix": "echomimic_output",
-      "save_output": true
+      "save_output": true,
+      "pingpong": false,
+      "loop_count": 0
     }
   }
 }
